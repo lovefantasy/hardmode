@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <div class="errbox">
+    <div id="error">
+      <h1><%= message %></h1>
+      <h2><%= error.status %></h2>
+      <pre><%= error.stack %></pre>
+      <br>
+      <p>若有其他疑問，請聯絡開發者。</p>
+      <progress value="10" max="10" id="pageBeginCountdown"></progress>
+      <p>頁面將在 <span id="pageBeginCountdownText">10</span> 秒後重新導向回首頁。</p>
+      <button class="tohome" onclick="toHome()">點擊回首頁</button>
+    </div>
+  </div>
+  <script>
+    ProgressCountdown(10, 'pageBeginCountdown', 'pageBeginCountdownText');
+    function ProgressCountdown(timeleft, bar, text) {
+      return new Promise((resolve, reject) => {
+        var countdownTimer = setInterval(() => {
+          timeleft--;
+          document.getElementById(bar).value = timeleft;
+          document.getElementById(text).textContent = timeleft;
+          if (timeleft <= 0) {
+            clearInterval(countdownTimer);
+            window.location.href = "/";
+          }
+        }, 1000);
+      });
+    }
+    function toHome() {
+      window.location.href = "/";
+    }
+  </script>
+</body>
+</html>
