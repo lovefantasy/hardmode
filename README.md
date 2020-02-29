@@ -1,0 +1,2 @@
+# hardmode
+just a hardmode
