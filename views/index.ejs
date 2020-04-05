@@ -1,6 +1,62 @@
-<!DOCTYPE html>
-<html>
+<html lang="zh-tw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hardmode</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+  <script src="/js/contentHandler.js"></script>
+</head>
 <body>
-  <div>hello world!</div>
+  <div id="container">
+    <div id="status-box">Server: <span id="status">-</span> / <span id="online">0</span> online.</div>
+    <div id="content">
+    </div>
+    <div id="send-box">
+      <form id="send-form">
+        <input type="text" name="name" id="name" placeholder="暱稱">
+        <input type="text" name="msg" id="msg" placeholder="在此輸入：">
+        <input type="submit" value="送出">
+      </form>
+    </div>
+  </div>
+
+  <script>
+  var socket = io();
+  document.addEventListener("DOMContentLoaded", () => {
+
+    // socket events
+    socket.on("connect", function () { updateContent("WS連線成功。", "status"); });
+    socket.on("disconnect", function () { updateContent("WS已經離線。", "status"); });
+    socket.on("online", function (amount) { updateContent("" + amount, "online"); });
+    socket.on("chatMsg", function (data) { appendContent(data, "content"); });
+
+    // button events
+    var sendForm = document.getElementById("send-form");
+    sendForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const formFields = sendForm.children;
+      const formName = formFields.namedItem("name");
+      const formMsg = formFields.namedItem("msg");
+
+      if (!formName || !formMsg) {
+        return;
+      }
+
+      if (formMsg.value === "" || !formMsg.value) {
+        formMsg.classList.add("error");
+      } else {
+        formMsg.classList.remove("error");
+        var formData = {
+          name: formName.value,
+          msg: formMsg.value,
+          time: new Date().toUTCString()
+        };
+        socket.emit("sendMsg", formData);
+      }
+    });
+  });
+
+  </script>
 </body>
 </html>

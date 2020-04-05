@@ -4,6 +4,7 @@ const session = require('express-session');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const fs = require('fs');
 const app = express();
 
 // view engine setup
@@ -17,8 +18,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'node_modules')));
 
 app.use('/', require('./routes/index'));
+
+const routers = fs.readdirSync('./routes').filter(file => file.endsWith('.js'));
+for (const file of routers) {
+	const routerName = file.split('.');
+  app.use('/' + routerName[0], require('./routes/' + routerName[0]));
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
